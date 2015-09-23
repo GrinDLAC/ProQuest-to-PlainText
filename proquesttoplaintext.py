@@ -2,9 +2,9 @@ from sys import argv
 import time
 import csv
 
-timestamp = time.strftime('%H%M-%Y%m%d')
+TIMESTAMP = time.strftime('%H%M-%Y%m%d')
 
-class Article(object):
+class Article():
     fulltxt = ""
     Title = ""
     Publication = ""
@@ -13,10 +13,11 @@ class Article(object):
     Author = ""
     PQID = ""
 
-csvName = 'ProQuestToPlainText_'+timestamp+'.csv'
-fields = ['PQID', 'Title', 'Author', 'Publication', 'Date', 'Year']
+CSVNAME = 'ProQuestToPlainText_' + TIMESTAMP + '.csv'
+FIELDS = ['PQID', 'Title', 'Author', 'Publication', 'Date', 'Year']
 csvFile = open(csvName, 'wb')
 csvwriter = csv.DictWriter(csvFile, delimiter=',', fieldnames=fields)
+
 #write csv headers
 csvwriter.writerow(dict((fn, fn) for fn in fields))
 
@@ -38,10 +39,9 @@ def writeMetadata(doc):
 
 def writeArticle(doc):
     name = abbreviate(doc.Publication)+'_'+doc.Year+'_'+doc.PQID+'.txt'
-    txtFile = open(name, 'a')
-    txtFile.write(Article.Title)
-    txtFile.write(Article.fulltxt)
-    txtFile.close()
+    with open(name, 'a') as f:
+        f.write(doc.Title)
+        f.write(doc.fulltxt)
 
 
 script, filename = argv
@@ -71,18 +71,18 @@ for line in docs:
     	 	continue
     	 else:
     	 	doc.fulltxt = doc.fulltxt + "\n" +line
-    elif line.startswith("Title:"):
-         doc.Title = line[6:]
-    elif line.startswith("Publication title:"):
-         doc.Publication = line[19:]
-    elif line.startswith("Author:"):
-         doc.Author = line[8:]
-    elif line.startswith("Publication date:"):
-         doc.Date = line[18:]
-    elif line.startswith("ProQuest document ID:"):
-         doc.PQID = line[22:]
-    elif line.startswith("Publication year:"):
-         doc.Year = line[18:]
+    elif line.startswith("Title: "):
+         doc.Title = line.split("Title: ")[1]
+    elif line.startswith("Publication title: "):
+         doc.Publication = line.split("Publication title: ")[1]
+    elif line.startswith("Author: "):
+         doc.Author = line.split("Author: ")[1]
+    elif line.startswith("Publication date: "):
+         doc.Date = line.split("Publication date: ")[1]
+    elif line.startswith("ProQuest document ID: "):
+         doc.PQID = line.split("ProQuest document ID: ")[1]
+    elif line.startswith("Publication year: "):
+         doc.Year = line.split("Publication year: ")[1]
     elif not line or line.isspace() :
          continue
     else:
