@@ -39,6 +39,7 @@ def writeMetadata(doc):
 def writeArticle(doc):
     name = abbreviate(doc.Publication)+'_'+doc.Year+'_'+doc.PQID+'.txt'
     txtFile = open(name, 'a')
+    txtFile.write(Article.Title)
     txtFile.write(Article.fulltxt)
     txtFile.close()
 
@@ -51,34 +52,37 @@ for line in docs:
     line = line.strip()
     if line == '____________________________________________________________':
         #write out the previous doc
-        writeArticle(Article)
-        writeMetadata(Article)
+        try: doc
+        except NameError: doc = None
+        else:
+            writeArticle(doc)
+            writeMetadata(doc)
         #start new doc
         doc = Article()
         continue
     if line.startswith("Full text:"):
     	 #we're reading the full text
          readingtxt = True
-         Article.fulltxt = line[10:]
+         doc.fulltxt = line[10:]
          continue
     elif readingtxt:
     	 if line.startswith("Illustration") or line == "" :
     	 	readingtxt = False
     	 	continue
     	 else:
-    	 	Article.fulltxt = Article.fulltxt + "\n" +line
+    	 	doc.fulltxt = doc.fulltxt + "\n" +line
     elif line.startswith("Title:"):
-         Article.Title = line[6:]
+         doc.Title = line[6:]
     elif line.startswith("Publication title:"):
-         Article.Publication = line[19:]
+         doc.Publication = line[19:]
     elif line.startswith("Author:"):
-         Article.Author = line[8:]
+         doc.Author = line[8:]
     elif line.startswith("Publication date:"):
-         Article.Date = line[18:]
+         doc.Date = line[18:]
     elif line.startswith("ProQuest document ID:"):
-         Article.PQID = line[22:]
+         doc.PQID = line[22:]
     elif line.startswith("Publication year:"):
-         Article.Year = line[18:]
+         doc.Year = line[18:]
     elif not line or line.isspace() :
          continue
     else:
