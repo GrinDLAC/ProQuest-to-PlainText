@@ -51,7 +51,6 @@ readingtxt = False
 
 for line in docs:
     line = line.strip()
-    #if line.strip('_') == '':
     if line == "____________________________________________________________":
         #write out the previous doc
         try: doc
