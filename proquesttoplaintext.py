@@ -15,14 +15,14 @@ class Article():
 
 CSVNAME = 'ProQuestToPlainText_' + TIMESTAMP + '.csv'
 FIELDS = ['PQID', 'Title', 'Author', 'Publication', 'Date', 'Year']
-csvFile = open(csvName, 'wb')
-csvwriter = csv.DictWriter(csvFile, delimiter=',', fieldnames=fields)
+csv_file = open(CSVNAME, 'wb')
+csvwriter = csv.DictWriter(csv_file, delimiter=',', fieldnames=FIELDS)
 
 #write csv headers
-csvwriter.writerow(dict((fn, fn) for fn in fields))
+csvwriter.writerow(dict((fn, fn) for fn in FIELDS))
 
 def abbreviate(pub):
-    #a publication abbreviation is included in the filename of the textfile
+    """returns a publication abbreviation to be included in the filename of the textfile"""
     pubs = {
         'USA TODAY (pre-1997 Fulltext)' : 'USAT',
         'USA TODAY' : 'USAT',
@@ -31,14 +31,15 @@ def abbreviate(pub):
     }
     return pubs.get(pub, "X")
 
-def writeMetadata(doc):
-    #write the field values of the current doc to the csv file
+def write_metadata(doc):
+    """write the field values of the current doc to the csv file"""
     if doc.fulltxt != "":
         writefields = dict((field, getattr(doc, field)) for field in vars(doc) if not field.startswith('__') and field != 'fulltxt')
         csvwriter.writerow(writefields)
 
-def writeArticle(doc):
-    name = abbreviate(doc.Publication)+'_'+doc.Year+'_'+doc.PQID+'.txt'
+def write_article(doc):
+    """write the full text of the article to it's own text file."""
+    name = abbreviate(doc.Publication) + '_' + doc.Year + '_' + doc.PQID + '.txt'
     with open(name, 'a') as f:
         f.write(doc.Title)
         f.write(doc.fulltxt)
@@ -50,27 +51,28 @@ readingtxt = False
 
 for line in docs:
     line = line.strip()
-    if line == '____________________________________________________________':
+    #if line.strip('_') == '':
+    if line == "____________________________________________________________":
         #write out the previous doc
         try: doc
         except NameError: doc = None
         else:
-            writeArticle(doc)
-            writeMetadata(doc)
+            write_article(doc)
+            write_metadata(doc)
         #start new doc
         doc = Article()
         continue
     if line.startswith("Full text:"):
     	 #we're reading the full text
          readingtxt = True
-         doc.fulltxt = line[10:]
+         doc.fulltxt = line.split("Full text: ")[1]
          continue
     elif readingtxt:
     	 if line.startswith("Illustration") or line == "" :
     	 	readingtxt = False
     	 	continue
     	 else:
-    	 	doc.fulltxt = doc.fulltxt + "\n" +line
+    	 	doc.fulltxt = doc.fulltxt + "\n" + line
     elif line.startswith("Title: "):
          doc.Title = line.split("Title: ")[1]
     elif line.startswith("Publication title: "):
@@ -88,5 +90,5 @@ for line in docs:
     else:
          continue
 
-csvFile.close()
+csv_file.close()
 docs.close()
