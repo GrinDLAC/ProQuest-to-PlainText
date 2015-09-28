@@ -75,7 +75,8 @@ for line in docs:
     elif line.startswith("Title: "):
          doc.Title = line.split("Title: ")[1]
     elif line.startswith("Publication title: "):
-         doc.Publication = line.split("Publication title: ")[1]
+         Publication = line.split("Publication title: ")[1]
+         doc.Publication = Publication.split(",")[0]
     elif line.startswith("Author: "):
          doc.Author = line.split("Author: ")[1]
     elif line.startswith("Publication date: "):
