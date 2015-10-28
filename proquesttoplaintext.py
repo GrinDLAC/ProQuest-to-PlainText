@@ -1,6 +1,8 @@
 from sys import argv
 import time
 import csv
+import os
+
 
 TIMESTAMP = time.strftime('%H%M-%Y%m%d')
 
@@ -13,7 +15,7 @@ class Article():
     Author = ""
     PQID = ""
 
-CSVNAME = 'ProQuestToPlainText_' + TIMESTAMP + '.csv'
+CSVNAME = os.path.abspath('Documents/Scratch/ProQuestToPlainText_' + TIMESTAMP + '.csv')
 FIELDS = ['PQID', 'Title', 'Author', 'Publication', 'Date', 'Year']
 csv_file = open(CSVNAME, 'wb')
 csvwriter = csv.DictWriter(csv_file, delimiter=',', fieldnames=FIELDS)
@@ -39,7 +41,8 @@ def write_metadata(doc):
 
 def write_article(doc):
     """write the full text of the article to it's own text file."""
-    name = abbreviate(doc.Publication) + '_' + doc.Year + '_' + doc.PQID + '.txt'
+    DOCNAME = abbreviate(doc.Publication) + '_' + doc.Year + '_' + doc.PQID + '.txt'
+    name = os.path.abspath('Documents/Scratch/'+DOCNAME)
     with open(name, 'a') as f:
         f.write(doc.Title)
         f.write(doc.fulltxt)
